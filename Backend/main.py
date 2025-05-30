@@ -1,4 +1,4 @@
-from fastapi import FastAPI, status
+from fastapi import FastAPI, status, Query
 import psycopg2
 from pydantic import BaseModel
 from datetime import datetime
@@ -23,7 +23,7 @@ class Response(BaseModel):
 class Create_Task(BaseModel):
     title: str
     description: str
-    status: str
+    status: str | None=None
 
 class update_task(BaseModel):
     title: str
@@ -64,10 +64,29 @@ def home():
 
 @app.get("/get-tasks")
 def get_tasks():
-    query = "SELECT * FROM tasks"
-    cursor.execute(query)
+
+    query = '''SELECT 
+    tasks.id AS task_id, 
+    tasks.title, 
+    tasks.description, 
+    tasks.status, 
+    tasks.created_at, 
+    tasks.updated_at, 
+    users.id AS user_id, 
+    users.username, 
+    users.email
+    FROM tasks
+    JOIN task_assignments ON tasks.id = task_assignments.task_id
+    JOIN users ON task_assignments.user_id = users.id;'''
+
+    temp_query = "SELECT * FROM tasks"
+
+    cursor.execute(temp_query)
+    col_names = [col[0] for col in cursor.description]
     data = cursor.fetchall()
-    return data
+
+    tasks = [dict(zip(col_names, row)) for row in data]
+    return tasks
 
 @app.post("/register", status_code=status.HTTP_201_CREATED)
 def register(user: User_Register):
@@ -99,10 +118,10 @@ def login(user: User_Login):
         return Response(status=True, msg="Login successful", status_code=200, data={"username": user_data[0], "email": user_data[1]})
     return Response(status=False, msg="Login Failed", data=user_data, status_code=status.HTTP_401_UNAUTHORIZED)
 
-@app.post("/task", status_code=status.HTTP_201_CREATED)
+@app.post("/add-task", status_code=status.HTTP_201_CREATED)
 def create_task(task: Create_Task):
-    query_task = "INSERT INTO Tasks(title, description, status, created_at) VALUES (%s, %s, %s, %s)"
-    cursor.execute(query_task, (task.title, task.description, task.status, datetime.now()))
+    query_task = "INSERT INTO Tasks(title, description, created_at) VALUES (%s, %s, %s)"
+    cursor.execute(query_task, (task.title, task.description, datetime.now()))
     connection.commit()
     return Response(status=True, msg="Task created successfully", status_code=201)
 
@@ -119,3 +138,10 @@ def task_assignment(task: task_assignment):
     cursor.execute(task_assignment_query, (task.task_id, task.user_id))
     connection.commit()
     return Response(status=True, msg="Task assinged successfully", status_code=200)
+
+@app.delete("/delete-task", status_code=status.HTTP_200_OK)
+def delete_task(id: int = Query(...)):
+    delete_query = "DELETE FROM tasks WHERE id=%s"
+    cursor.execute(delete_query, (id, ))
+    connection.commit()
+    return Response(status=True, msg="Task Deleted Successfully", status_code=200)

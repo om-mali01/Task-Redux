@@ -1,4 +1,5 @@
 import './App.css'
+import AddTaskForm from './components/addTaskForm'
 import HomePage from './pages/HomePage'
 import Login from './pages/LoginPage'
 import Register from './pages/RegisterPage'

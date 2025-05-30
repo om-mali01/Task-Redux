@@ -1,6 +1,9 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getTasks } from "../redux/actions/loginAction";
+import Dashboard from "../components/dashboard";
+import TaskComponent from "../components/taskComponent";
+import AddTaskForm from "../components/addTaskForm";
 
 function HomePage() {
 
@@ -11,18 +14,18 @@ function HomePage() {
             return state.userDataEverything.userData
         });
 
-    console.log(userData,"fgsagdfsghsdhsdfhsdf")
+    console.log(userData,"fgsagdfsghsdhsdfhsdf");
 
     useEffect(()=>{
         dispatch(getTasks())
-    },[])
-    
+    }, [])
+
     return(
         <div>
             <div>
-                <h1>Home Page</h1>
-                {userData.username}<br />
-                {userData.email}
+                <Dashboard />
+                <TaskComponent />
+              
             </div>
         </div>
     )

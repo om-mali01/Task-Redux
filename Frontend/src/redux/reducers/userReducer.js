@@ -1,4 +1,4 @@
-import {createSlice} from "@reduxjs/toolkit"
+import {createSlice} from "@reduxjs/toolkit";
 
 const initialState = {
     userData:[],
@@ -16,7 +16,6 @@ const userSlice = createSlice({
             state.getTask = action.payload
         }
     }
-
 })
 
 export const {userData, getTask} = userSlice.actions;

@@ -11,13 +11,16 @@ function Login(){
     const dispatch = useDispatch()
     const navigate = useNavigate()
 
-    // const userdata = useSelector((state)=>{
+    // const userdata = useSelector((state)=> {
     //     console.log(state,"fjkldasjfkljklsajd")
     //     return state.userDataEverything.userData
     // })
 
     const handleChange = (e) => {
-        setForm({...form, [e.target.name]: e.target.value})
+        setForm({
+            ...form,
+            [e.target.name]: e.target.value
+        })
     }
 
     const handleSubmit = (e) => {

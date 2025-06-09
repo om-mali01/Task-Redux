@@ -11,7 +11,7 @@ function HomePage() {
     const userData = useSelector((state) => 
         {
             console.log(state,"faskljfklsajklfjklasd")
-            return state.userDataEverything.userData
+            return state.userDataEverything
         });
 
     console.log(userData,"fgsagdfsghsdhsdfhsdf");

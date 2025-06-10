@@ -1,9 +1,12 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getTasks } from "../redux/actions/loginAction";
+import {getTasksAction} from "../redux/actions/loginAction";
 import Dashboard from "../components/dashboard";
 import TaskComponent from "../components/taskComponent";
 import AddTaskForm from "../components/addTaskForm";
+import AssignTaskForm from "../components/assignTaskForm";
+import Modal from "../components/TrialModal";
+// import StaticExample from "../components/TrialModal";
 
 function HomePage() {
 
@@ -17,7 +20,7 @@ function HomePage() {
     console.log(userData,"fgsagdfsghsdhsdfhsdf");
 
     useEffect(()=>{
-        dispatch(getTasks())
+        dispatch(getTasksAction())
     }, [])
 
     return(
@@ -25,7 +28,16 @@ function HomePage() {
             <div>
                 <Dashboard />
                 <TaskComponent />
-              
+                {/* <Modal 
+                    cstmClass={"w-[500px] h-[300px] bg-white"}
+                    // setVisible={true}
+                    showFooter={false}
+                    visible={true}
+                    innerContent={<div>hello</div>}
+                    heading="hello"
+                    /> */}
+                {/* <StaticExample /> */}
+
             </div>
         </div>
     )

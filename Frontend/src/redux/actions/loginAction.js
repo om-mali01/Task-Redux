@@ -21,7 +21,7 @@ export const registerAction = (registerData) => async(dispatch) => {
     }
 }
 
-export const getTasks = () => async (dispatch ) => {
+export const getTasksAction = () => async (dispatch) => {
     try{
         dispatch(getTask([]))
         const data = await apiclient.get("/get-tasks");

@@ -32,8 +32,9 @@ class update_task(BaseModel):
     id: int
 
 class task_assignment(BaseModel):
-    task_id: int
-    user_id: int
+    user_name: str
+    task: str
+    description: str
 
 app = FastAPI()
 
@@ -132,16 +133,26 @@ def task_update(task: update_task):
     connection.commit()
     return Response(status=True, msg="Task Updated successfully", status_code=200)
 
-@app.post("/task_assignment", status_code=status.HTTP_200_OK)
-def task_assignment(task: task_assignment):
-    task_assignment_query = "INSERT INTO task_assignments(task_id, user_id) VALUES (%s, %s)"
-    cursor.execute(task_assignment_query, (task.task_id, task.user_id))
-    connection.commit()
-    return Response(status=True, msg="Task assinged successfully", status_code=200)
-
 @app.delete("/delete-task", status_code=status.HTTP_200_OK)
 def delete_task(id: int = Query(...)):
     delete_query = "DELETE FROM tasks WHERE id=%s"
     cursor.execute(delete_query, (id, ))
     connection.commit()
     return Response(status=True, msg="Task Deleted Successfully", status_code=200)
+
+@app.post("/assign-task", status_code=status.HTTP_200_OK)
+def assign_task(task: task_assignment):
+    add_task_query = "INSERT INTO tasks(title, description) VALUES (%s, %s) RETURNING id"
+    cursor.execute(add_task_query, (task.task, task.description))
+    task_id = cursor.fetchone()[0]
+    connection.commit()
+
+    user_id_query = "SELECT id FROM users WHERE(username=%s)"
+    cursor.execute(user_id_query, (task.user_name,))
+    user_id = cursor.fetchone()[0]
+
+    assign_table_insert = "INSERT INTO task_assignments(task_id, user_id) VALUES(%s, %s)"
+    cursor.execute(assign_table_insert, (task_id, user_id))
+    connection.commit()
+
+    return Response(status=True, msg="Task Assigned successfully", status_code=200)

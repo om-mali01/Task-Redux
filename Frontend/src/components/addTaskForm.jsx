@@ -3,6 +3,7 @@ import { useDispatch } from "react-redux";
 import { AddTaskAction } from "../redux/actions/TaskAction";
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
+import {getTasksAction} from "../redux/actions/loginAction";
 
 const AddTaskForm=({setIsData})=> {
     const [form, setForm] = useState({
@@ -18,6 +19,7 @@ const AddTaskForm=({setIsData})=> {
         dispatch(AddTaskAction(form, ()=>{
             console.log("closing the form")
             setIsData(false);
+            dispatch(getTasksAction())
         }));
     }
 
@@ -49,7 +51,7 @@ const AddTaskForm=({setIsData})=> {
 
                 <button
                 type="submit"
-                className="bg-white rounded-md w-fit h-7 text-sm p-1"
+                className="bg-white rounded-md w-fit h-7 text-sm p-1 ml-3"
                 >Add Task</button>
 
             </form>

@@ -4,7 +4,8 @@ import apiclient from "../../utils/apiclient"
 export const loginAction = (logindata) => async(dispatch) => {
     try{
         const data = await apiclient.post("/login", logindata);
-        dispatch(userData(data.data.data));
+        localStorage.setItem("username",data.data.data.username);
+        dispatch(userData(data.data.data))
     }
     catch(error){
         console.log(error);

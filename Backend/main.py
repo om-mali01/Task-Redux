@@ -64,10 +64,10 @@ def home():
     return {"key": "home page"}
 
 @app.get("/get-tasks")
-def get_tasks():
+def get_tasks(page: int | None=None):
 
     query = '''SELECT 
-    tasks.id AS task_id, 
+    tasks.id AS task_id,
     tasks.title, 
     tasks.description, 
     tasks.status, 
@@ -80,9 +80,16 @@ def get_tasks():
     JOIN task_assignments ON tasks.id = task_assignments.task_id
     JOIN users ON task_assignments.user_id = users.id;'''
 
-    temp_query = "SELECT * FROM tasks"
+   
+    if not page:
+        temp2 = "select * from tasks"
+        cursor.execute(temp2)
+    else:
+        offset = (page - 1) * 6
+        temp_query = f"SELECT * FROM tasks LIMIT 6 OFFSET {offset}"
+        cursor.execute(temp_query)
 
-    cursor.execute(temp_query)
+    # cursor.execute(temp_query)
     col_names = [col[0] for col in cursor.description]
     data = cursor.fetchall()
 

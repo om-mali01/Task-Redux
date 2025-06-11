@@ -9,7 +9,7 @@ function Dashboard(){
     console.log(userData); 
     const a = localStorage.getItem("username")
 
-    const tasks = useSelector((state) => state.userDataEverything.getTask);
+    const tasks = useSelector((state) => state.userDataEverything.taskLength);
     console.log(tasks);
 
     const [isData, setIsData] = useState(false);
@@ -18,7 +18,7 @@ function Dashboard(){
     return(
         <div className="bg-blue-400 m-4 h-32 p-5 relative rounded-md">
             <h1 className="text-2xl">Welcome {a === undefined ? "":a} !!</h1>
-            <h2 className="pt-3">You have {tasks.length} tasks</h2>
+            <h2 className="pt-3">You have {tasks?.length} tasks</h2>
 
             <div>
                 <button 

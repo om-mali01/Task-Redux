@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {getTasksAction} from "../redux/actions/loginAction";
+import {getTasksAction, getTasksLength} from "../redux/actions/loginAction";
 import Dashboard from "../components/dashboard";
 import TaskComponent from "../components/taskComponent";
 import AddTaskForm from "../components/addTaskForm";
@@ -20,12 +20,13 @@ function HomePage() {
     console.log(userData,"fgsagdfsghsdhsdfhsdf");
 
     useEffect(()=>{
-        dispatch(getTasksAction())
-    }, [])
+        dispatch(getTasksAction(1))
+        dispatch(getTasksLength())
+    }, [dispatch])
 
     return(
         <div>
-            <div>
+        <div className="fixed top-0 left-0 w-full h-full overflow-hidden">
                 <Dashboard />
                 <TaskComponent />
                 {/* <Modal 

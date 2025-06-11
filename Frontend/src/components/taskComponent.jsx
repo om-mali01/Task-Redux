@@ -1,11 +1,15 @@
 import { useDispatch, useSelector } from "react-redux";
 import { DeleteTaskAction, UpdateTaskAction } from "../redux/actions/TaskAction";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import UpdateTaskForm from "./updateTaskForm";
+import { getTasksAction } from "../redux/actions/loginAction";
 
 function TaskComponent(){
 
     const tasks = useSelector((state) => state.userDataEverything.getTask);
+    const taskLength = useSelector((state) => state.userDataEverything.taskLength);
+    console.log(tasks,"jsdfgjjjjjjjjjjjjjj")
+    const [page, setPages] = useState(false)
     console.log(tasks, "asdfaf");
 
     const getStatusBg = (status) => {
@@ -30,14 +34,17 @@ function TaskComponent(){
     const [updatedTaskId, setUpdatedTaskId] = useState(null);
     const [isUpdatedForm, setIsUpdatedForm] = useState(false);
 
+    const pagess = Math.ceil(taskLength?.length / 6)
+    const pagesss = [...Array(pagess)].map((itm , i) => i+1)
+
     return(
         <div className="bg-blue-400 m-4 rounded-md">
             <h1 className="p-5 text-xl">Tasks List</h1>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-3 gap-2 h-[400px] ">
                 {
                     tasks.length > 0 ? (
                         tasks.map((task, index) => (
-                            <div key={index} className="w-96 h-auto p-2 m-5 bg-white rounded-md">
+                            <div key={index} className="w-96 p-2 m-5 h-[160px] bg-white rounded-md">
                                 <div className="">
                                 <h2 className="text-lg">{task.title}</h2>
                                 <p className="text-sm">{task.description}</p>
@@ -69,6 +76,16 @@ function TaskComponent(){
                     )
                 }
             </div>
+<div className="flex w-full justify-center gap-9">
+             {pagesss?.map((itm) => {
+                return (
+                    <>
+                    <button className="bg-white w-8 text-center mb-4 border rounded-lg" onClick={
+                        () => dispatch(getTasksAction(itm))
+                    }>{itm}</button></>
+                )
+             })}
+        </div>
         </div>
     )
 }

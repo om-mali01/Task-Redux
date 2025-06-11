@@ -14,9 +14,12 @@ const userSlice = createSlice({
         },
         getTask:(state, action)=>{
             state.getTask = action.payload
+        },
+        taskLength: (state, action) => {
+            state.taskLength = action.payload
         }
     }
 })
 
-export const {userData, getTask} = userSlice.actions;
+export const {userData, getTask, taskLength} = userSlice.actions;
 export default userSlice.reducer;

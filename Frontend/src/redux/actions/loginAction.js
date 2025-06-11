@@ -1,4 +1,4 @@
-import { getTask, userData } from "../reducers/userReducer"
+import { getTask, taskLength, userData } from "../reducers/userReducer"
 import apiclient from "../../utils/apiclient"
 
 export const loginAction = (logindata) => async(dispatch) => {
@@ -22,11 +22,23 @@ export const registerAction = (registerData) => async(dispatch) => {
     }
 }
 
-export const getTasksAction = () => async (dispatch) => {
+export const getTasksAction = (page) => async (dispatch) => {
     try{
         dispatch(getTask([]))
-        const data = await apiclient.get("/get-tasks");
+        const data = await apiclient.get("/get-tasks", {
+            params: {page}
+        });
         dispatch(getTask(data.data))
+    }catch(error){
+        console.log(error);
+    }
+}
+
+export const getTasksLength = () => async (dispatch) => {
+    try{
+        dispatch(taskLength([]))
+        const data = await apiclient.get("/get-tasks");
+        dispatch(taskLength(data.data))
     }catch(error){
         console.log(error);
     }

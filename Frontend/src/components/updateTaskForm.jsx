@@ -14,16 +14,23 @@ function UpdateTaskForm({id, setIsUpdatedForm , isUpdatedForm}){
     const handleSubmit = (e) =>{
         e.preventDefault();
         console.log(form);
-        dispatch(UpdateTaskAction(form));
-        setIsUpdatedForm(false);    
+        dispatch(UpdateTaskAction(form, ()=> {
+            setIsUpdatedForm(false);
+        }));  
     }
     
     const handleChange = (e) =>{
         setForm({...form, [e.target.name]: e.target.value})
     }
 
+    const handleCLose = (e) =>{
+        setIsUpdatedForm(false);
+    }
+
     return(
-        (isUpdatedForm && <div className="flex justify-center items-center w-60 h-56 m-5 bg-slate-300">
+        <div className="flex items-center justify-center bg-opacity-50">
+
+        { isUpdatedForm && <div className="bg-white p-6 rounded-lg shadow-lg w-96">
             <form onSubmit={handleSubmit} className="flex flex-col space-y-3 p-5 items-center">
             <h1 className="text-lg font-bold">Update the Task</h1>
                 <input type="text" 
@@ -50,13 +57,23 @@ function UpdateTaskForm({id, setIsUpdatedForm , isUpdatedForm}){
                 className="p-1"
                 />
 
-                <button
-                    type="submit"
-                    className="bg-blue-300 w-fit p-1 rounded-md text-sm"
-                >Update Task</button>
+                <div>
+                    <button
+                        type="submit"
+                        className="bg-blue-500 text-white px-4 py-2 m-2 rounded"
+                    >Update Task</button>
+
+                    <button 
+                    className="bg-gray-500 text-white px-4 py-2 rounded"
+                    onClick={handleCLose}
+                    >Close</button>
+                </div>
 
             </form>
-        </div>)
+        </div>}
+
+        </div>
+        
     )
 }
 

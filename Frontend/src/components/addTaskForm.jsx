@@ -19,7 +19,7 @@ const AddTaskForm=({setIsData})=> {
         dispatch(AddTaskAction(form, ()=>{
             console.log("closing the form")
             setIsData(false);
-            dispatch(getTasksAction())
+            dispatch(getTasksAction());
         }));
     }
 
@@ -27,34 +27,40 @@ const AddTaskForm=({setIsData})=> {
         setForm({...form, [e.target.name]: e.target.value})
     }
 
+    const handleClose = (e) => {
+        console.log("close btn pressed")
+        setIsData(false);
+    }
+
     return(
-        <div className="flex justify-center items-center h-52 w-60 bg-slate-400 rounded-md m-4 relative">
-            <form onSubmit={handleSubmit} className="flex flex-col space-y-4 absolute bottom-10">
-                <h1 className="text-center">Create New Task</h1>
-
-                <input type="text"
-                placeholder="Title"
-                name="title"
-                value={form.title}
-                onChange={handleChange}
-                className="p-1"
-                required
-                />
-
-                <input type="text"
-                placeholder="Description"
-                value={form.description}
-                onChange={handleChange}
-                name="description"
-                className="p-1"
-                required />
-
-                <button
-                type="submit"
-                className="bg-white rounded-md w-fit h-7 text-sm p-1 ml-3"
-                >Add Task</button>
-
-            </form>
+        <div className="flex items-center justify-center bg-opacity-50">
+            <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+                <h1 className="text-center text-lg font-bold mb-4">Create New Task</h1>
+                <form onSubmit={handleSubmit} className="flex flex-col">
+                    <input
+                        type="text"
+                        placeholder="Title"
+                        name="title"
+                        value={form.title}
+                        onChange={handleChange}
+                        className="p-2 border rounded mb-2"
+                        required
+                    />
+                    <input
+                        type="text"
+                        placeholder="Description"
+                        name="description"
+                        value={form.description}
+                        onChange={handleChange}
+                        className="p-2 border rounded mb-4"
+                        required
+                    />
+                    <div className="flex justify-between">
+                        <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">Add Task</button>
+                        <button onClick={handleClose} className="bg-gray-500 text-white px-4 py-2 rounded">Close</button>
+                    </div>
+                </form>
+            </div>
         </div>
     )
 }

@@ -58,7 +58,7 @@ function TaskComponent(){
                                 </div>
                                 <div className="absolute right-[500px] ">
                                 {updatedTaskId === task.id && (
-                                        <UpdateTaskForm id={task.id} setIsUpdatedForm={setIsUpdatedForm} isUpdatedForm={isUpdatedForm}/>
+                                        <UpdateTaskForm className="flex justify-center items-center" id={task.id} setIsUpdatedForm={setIsUpdatedForm} isUpdatedForm={isUpdatedForm}/>
                                 )}
                                 </div>
                             </div>

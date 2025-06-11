@@ -19,27 +19,30 @@ function Dashboard(){
             <h1 className="text-2xl">Welcome {userData?.username} !!</h1>
             <h2 className="pt-3">You have {tasks.length} tasks</h2>
 
-            <button 
-            className="bg-white text-sm h-7 p-1 mt-1 rounded-md"
-            onClick={()=>{
-                setIsData(true);
-            }}
-            >Add New Task</button>
+            <div>
+                <button 
+                className="bg-white text-sm h-7 p-1 mr-2 rounded-md"
+                onClick={()=>{
+                    setIsData(true);
+                }}
+                >Add New Task</button>
 
-            <button 
-            className="bg-white text-sm h-7 p-1 mt-1 rounded-md"
-            onClick={()=>{
-                setAssignForm(true);
-            }}
-            >
-            Assign Task
-            </button>
+                <button 
+                className="bg-white text-sm h-7 p-1 rounded-md"
+                onClick={()=>{
+                    setAssignForm(true);
+                }}
+                >
+                Assign Task
+                </button>
+            </div>
+            
 
-            {isData && <div className="absolute top-[400px]">
+            {isData && <div className="flex items-center justify-center">
                 <AddTaskForm setIsData={setIsData} />
             </div>}
 
-            {isAssignForm && <div className="absolute top-[400px]">
+            {isAssignForm && <div className="flex items-center justify-center">
                 <AssignTaskForm setAssignForm={setAssignForm}/>
             </div> }
         </div>

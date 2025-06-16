@@ -63,6 +63,13 @@ cursor = connection.cursor()
 def home():
     return {"key": "home page"}
 
+@app.get("/total-task-length")
+def get_total_length():
+    query = "select count(*) from tasks"
+    cursor.execute(query)
+    length = cursor.fetchone()
+    return length[0]
+
 @app.get("/get-tasks")
 def get_tasks(page: int | None=None):
 

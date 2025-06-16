@@ -37,7 +37,7 @@ export const getTasksAction = (page) => async (dispatch) => {
 export const getTasksLength = () => async (dispatch) => {
     try{
         dispatch(taskLength([]))
-        const data = await apiclient.get("/get-tasks");
+        const data = await apiclient.get("/total-task-length");
         dispatch(taskLength(data.data))
     }catch(error){
         console.log(error);

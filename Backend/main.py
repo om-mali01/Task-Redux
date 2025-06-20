@@ -1,9 +1,14 @@
-from fastapi import FastAPI, status, Query
+from fastapi import FastAPI, status, Query, Depends, HTTPException
 import psycopg2
 from pydantic import BaseModel
 from datetime import datetime
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Optional
+from jwt_auth import create_token, decode_token
+from fastapi.security import OAuth2PasswordBearer
+from typing import Annotated
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 class User_Register(BaseModel):
     user_name: str
@@ -23,7 +28,7 @@ class Response(BaseModel):
 class Create_Task(BaseModel):
     title: str
     description: str
-    status: str | None=None
+    status: str
 
 class update_task(BaseModel):
     title: str
@@ -121,24 +126,46 @@ def register(user: User_Register):
 
 @app.post("/login", status_code=status.HTTP_200_OK)
 def login(user: User_Login):
-    query_password = "SELECT password FROM users WHERE(username=%s)"
-    cursor.execute(query_password, (user.user_name,))
-    password = cursor.fetchone()
+    try:
+        
+        query_password = "SELECT password FROM users WHERE(username=%s)"
+        cursor.execute(query_password, (user.user_name,))
+        password = cursor.fetchone()
 
-    query_data = "SELECT username, email FROM users WHERE(username=%s)"
-    cursor.execute(query_data, (user.user_name,))
-    user_data = cursor.fetchone()
+        query_data = "SELECT username, email FROM users WHERE(username=%s)"
+        cursor.execute(query_data, (user.user_name,))
+        user_data = cursor.fetchone()
+        
+        data = {"user_name": user.user_name}
+        access_token = create_token(data)
 
-    if password[0] == user.password:
-        return Response(status=True, msg="Login successful", status_code=200, data={"username": user_data[0], "email": user_data[1]})
-    return Response(status=False, msg="Login Failed", data=user_data, status_code=status.HTTP_401_UNAUTHORIZED)
+        if password[0] == user.password:
+            data = {"user_name": user.user_name}
+            access_token = create_token(data)
+            return Response(status=True, msg="Login successful", status_code=200, data={"access_token": access_token})
+        return Response(status=False, msg="Login Failed", data=user_data, status_code=status.HTTP_401_UNAUTHORIZED)
+    except Exception as e:
+        return Response(status=False, msg=f"Internal server errror {e}", status_code=500)
 
 @app.post("/add-task", status_code=status.HTTP_201_CREATED)
-def create_task(task: Create_Task):
-    query_task = "INSERT INTO Tasks(title, description, created_at) VALUES (%s, %s, %s)"
-    cursor.execute(query_task, (task.title, task.description, datetime.now()))
-    connection.commit()
-    return Response(status=True, msg="Task created successfully", status_code=201)
+def create_task(current_user: Annotated[str, Depends(oauth2_scheme)], task: Create_Task):
+    try:
+        payload = decode_token(current_user)
+        user_name = payload["user_name"]
+        if not user_name:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={"msg": "User not found"})
+
+        user_id_query = "SELECT id FROM users WHERE(username=%s)"
+        cursor.execute(user_id_query, (user_name,))
+        user_id = cursor.fetchone()[0]
+
+        query_task = "INSERT INTO Tasks(title, description, status, created_at, user_id) VALUES (%s, %s, %s, %s, %s)"
+        cursor.execute(query_task, (task.title, task.description, task.status, datetime.now(), user_id))
+
+        connection.commit()
+        return Response(status=True, msg="Task created successfully", status_code=201)
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail={"msg": f"Internal server error {e}"})
 
 @app.put("/task-update", status_code=status.HTTP_200_OK)
 def task_update(task: update_task):
@@ -155,18 +182,30 @@ def delete_task(id: int = Query(...)):
     return Response(status=True, msg="Task Deleted Successfully", status_code=200)
 
 @app.post("/assign-task", status_code=status.HTTP_200_OK)
-def assign_task(task: task_assignment):
-    add_task_query = "INSERT INTO tasks(title, description) VALUES (%s, %s) RETURNING id"
-    cursor.execute(add_task_query, (task.task, task.description))
-    task_id = cursor.fetchone()[0]
-    connection.commit()
+def assign_task(current_user: Annotated[str, Depends(oauth2_scheme)], task: task_assignment):
+    try:
+        payload = decode_token(current_user)
+        user_name = payload["user_name"]
+        if not user_name:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={"msg": "user not found"})
+        
+        user_id_query = "SELECT id FROM users WHERE(username=%s)"
+        cursor.execute(user_id_query, (task.user_name,))
+        user_id = cursor.fetchone()[0]
 
-    user_id_query = "SELECT id FROM users WHERE(username=%s)"
-    cursor.execute(user_id_query, (task.user_name,))
-    user_id = cursor.fetchone()[0]
+        user_id_query = "SELECT id FROM users WHERE(username=%s)"
+        cursor.execute(user_id_query, (user_name,))
+        assigned_user_id = cursor.fetchone()[0]
 
-    assign_table_insert = "INSERT INTO task_assignments(task_id, user_id) VALUES(%s, %s)"
-    cursor.execute(assign_table_insert, (task_id, user_id))
-    connection.commit()
+        add_task_query = "INSERT INTO tasks(title, description, user_id) VALUES (%s, %s, %s) RETURNING id"
+        cursor.execute(add_task_query, (task.task, task.description, user_id))
+        task_id = cursor.fetchone()[0]
+        connection.commit()
 
-    return Response(status=True, msg="Task Assigned successfully", status_code=200)
+        assign_table_insert = "INSERT INTO task_assignments(task_id, user_id, assigned_by) VALUES(%s, %s, %s)"
+        cursor.execute(assign_table_insert, (task_id, user_id, assigned_user_id))
+        connection.commit()
+
+        return Response(status=True, msg="Task Assigned successfully", status_code=200)
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail={"msg": f"Internal server error {e}"})

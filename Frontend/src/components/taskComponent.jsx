@@ -12,7 +12,7 @@ function TaskComponent() {
     const [paginationStart, setPaginationStart] = useState(1);
 
     const [isUpdatedForm, setIsUpdatedForm] = useState(false);
-    const [selectedTaskId, setSelectedTaskId] = useState(null); // Track task to update
+    const [selectedTaskId, setSelectedTaskId] = useState(null);
 
     useEffect(() => {
         dispatch(getTasksAction(currentPage));
@@ -51,7 +51,6 @@ function TaskComponent() {
                             </p>
                             <p className="text-sm"><b>Created at:</b> {task.created_at}</p>
 
-                            {/* Open update form when clicking Update */}
                             <button 
                                 className="bg-blue-300 text-sm p-1 m-3 rounded-md"
                                 onClick={() => {
@@ -75,7 +74,6 @@ function TaskComponent() {
                 )}
             </div>
 
-            {/* Pagination remains unchanged */}
             <div className="flex justify-center space-x-2 p-4">
                 <button 
                     className="bg-gray-300 px-4 py-2 rounded-md"

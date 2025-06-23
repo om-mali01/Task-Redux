@@ -28,7 +28,7 @@ function UpdateTaskForm({id, setIsUpdatedForm , isUpdatedForm}){
     }
 
     return(
-        <div className="flex items-center justify-center bg-opacity-50">
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
         { isUpdatedForm && <div className="bg-white p-6 rounded-lg shadow-lg w-96">
             <form onSubmit={handleSubmit} className="flex flex-col space-y-3 p-5 items-center">
             <h1 className="text-lg font-bold">Update the Task</h1>

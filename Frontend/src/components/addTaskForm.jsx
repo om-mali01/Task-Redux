@@ -1,8 +1,6 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { AddTaskAction } from "../redux/actions/TaskAction";
-import Button from 'react-bootstrap/Button';
-import Modal from 'react-bootstrap/Modal';
 import {getTasksAction} from "../redux/actions/loginAction";
 
 const AddTaskForm=({setIsData})=> {
@@ -19,7 +17,7 @@ const AddTaskForm=({setIsData})=> {
         dispatch(AddTaskAction(form, ()=>{
             console.log("closing the form")
             setIsData(false);
-            dispatch(getTasksAction());
+            dispatch(getTasksAction(1));
         }));
     }
 
@@ -33,7 +31,7 @@ const AddTaskForm=({setIsData})=> {
     }
 
     return(
-        <div className="flex items-center justify-center bg-opacity-50">
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
             <div className="bg-white p-6 rounded-lg shadow-lg w-96">
                 <h1 className="text-center text-lg font-bold mb-4">Create New Task</h1>
                 <form onSubmit={handleSubmit} className="flex flex-col">

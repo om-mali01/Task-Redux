@@ -1,11 +1,13 @@
 import { getTask, taskLength, userData } from "../reducers/userReducer"
 import apiclient from "../../utils/apiclient"
+import { combineSlices } from "@reduxjs/toolkit";
 
 export const loginAction = (logindata) => async(dispatch) => {
     try{
         const data = await apiclient.post("/login", logindata);
-        localStorage.setItem("username",data.data.data.username);
-        dispatch(userData(data.data.data))
+        console.log(data.data, "asdfasdfasd");
+        localStorage.setItem("access_token",data.data.data.access_token);
+        // dispatch(userData(data.data.data))
     }
     catch(error){
         console.log(error);
@@ -37,8 +39,8 @@ export const getTasksAction = (page) => async (dispatch) => {
 export const getTasksLength = () => async (dispatch) => {
     try{
         dispatch(taskLength([]))
-        const data = await apiclient.get("/total-task-length");
-        dispatch(taskLength(data.data))
+        const lengthdata = await apiclient.get("/total-task-length");
+        dispatch(taskLength(lengthdata))
     }catch(error){
         console.log(error);
     }

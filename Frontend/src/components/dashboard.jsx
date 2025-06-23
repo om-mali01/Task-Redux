@@ -1,24 +1,33 @@
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import AddTaskForm from "./addTaskForm";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AssignTaskForm from "./assignTaskForm";
+import { getUserInfoAction } from "../redux/actions/userDataAction";
+import { getTasksLength } from "../redux/actions/loginAction"
 
 function Dashboard(){
 
-    const userData = useSelector((state) => state.userDataEverything.userData);
-    console.log(userData); 
-    const a = localStorage.getItem("username")
+    const dispatch = useDispatch();
+    const userData = useSelector((state) => {
+        return state.userDataEverything.userData.data});
 
-    const tasks = useSelector((state) => state.userDataEverything.taskLength);
-    console.log(tasks);
+    const tasks_length = useSelector((state) => {
+        console.log(state.userDataEverything.taskLength.data, "9999");
+        return state.userDataEverything.taskLength.data});
 
     const [isData, setIsData] = useState(false);
     const [isAssignForm, setAssignForm] = useState(false);
 
+    useEffect(() => {
+        dispatch(getUserInfoAction())
+        dispatch(getTasksLength())
+    },[dispatch])
+
     return(
         <div className="bg-blue-400 m-4 h-32 p-5 relative rounded-md">
-            <h1 className="text-2xl">Welcome {a === undefined ? "":a} !!</h1>
-            <h2 className="pt-3">You have {tasks?.length} tasks</h2>
+            <h1 className="text-2xl"> Welcome {userData?.username ? userData.username : "Guest"} !!</h1>
+
+            <h2 className="pt-3">You have {tasks_length === undefined ? "loading":tasks_length} tasks</h2>
 
             <div>
                 <button 

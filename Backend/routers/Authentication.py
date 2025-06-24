@@ -29,21 +29,23 @@ def register(user: User_Register):
 @router.post("/login", status_code=status.HTTP_200_OK)
 def login(user: User_Login):
     try:
-        query_password = "SELECT password FROM users WHERE(username=%s)"
-        cursor.execute(query_password, (user.user_name,))
-        password = cursor.fetchone()
+        query = "SELECT id, username, email, password FROM users WHERE username=%s"
+        cursor.execute(query, (user.user_name,))
+        user_record = cursor.fetchone()
 
-        query_data = "SELECT username, email FROM users WHERE(username=%s)"
-        cursor.execute(query_data, (user.user_name,))
-        user_data = cursor.fetchone()
+        if user_record and user.password == user_record[3]:
+            user_id = user_record[0]
+            user_name = user_record[1]
+
+            payload = {
+                "user_id": user_id,
+                "user_name": user_name
+            }
+
+            access_token = create_token(payload)
+            return Response(status=True, msg="Login successful", status_code=200, data={"access_token": access_token, "User_data": payload})
         
-        data = {"user_name": user.user_name}
-        access_token = create_token(data)
-
-        if password[0] == user.password:
-            data = {"user_name": user.user_name}
-            access_token = create_token(data)
-            return Response(status=True, msg="Login successful", status_code=200, data={"access_token": access_token})
-        return Response(status=False, msg="Login Failed", data=user_data, status_code=status.HTTP_401_UNAUTHORIZED)
+        return Response(status=False, msg="Login Failed", status_code=status.HTTP_401_UNAUTHORIZED)
     except Exception as e:
-        return Response(status=False, msg=f"Internal server errror {e}", status_code=500)
+        return Response(status=False, msg=f"Internal server error {e}", status_code=500)
+

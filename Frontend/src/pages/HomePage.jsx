@@ -1,15 +1,19 @@
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Dashboard from "../components/dashboard";
 import TaskComponent from "../components/taskComponent";
+import PaginationExample from "../Pagination";
+// import { PaginatedItems } from "../Pagination";
+// import StaticExample from "../components/TrialModal";
 
 function HomePage() {
 
-    // const dispatch = useDispatch()
-    // const userData = useSelector((state) =>
-    //     {
-    //         console.log(state,"faskljfklsajklfjklasd")
-    //         return state.userDataEverything
-    //     });
+    const dispatch = useDispatch()
+    const userData = useSelector((state) =>
+        {
+            console.log(state,"faskljfklsajklfjklasd")
+            return state.userDataEverything
+        });
 
     // console.log(userData,"fgsagdfsghsdhsdfhsdf");
 

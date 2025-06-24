@@ -5,8 +5,11 @@ import { combineSlices } from "@reduxjs/toolkit";
 export const loginAction = (logindata) => async(dispatch) => {
     try{
         const data = await apiclient.post("/login", logindata);
-        console.log(data.data, "asdfasdfasd");
+        console.log(data.data.data.User_data.user_id, "asdfasdfasd");
         localStorage.setItem("access_token",data.data.data.access_token);
+        localStorage.setItem("user_id", data.data.data.User_data.user_id);
+        localStorage.setItem("user_name", data.data.data.User_data.user_name);
+
         // dispatch(userData(data.data.data))
     }
     catch(error){

@@ -11,12 +11,14 @@ router = APIRouter(tags=["Tasks"])
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
+from fastapi import Header
 
 @router.get("/get-user-info")
-def get_user_details(current_user: Annotated[str, Depends(oauth2_scheme)]):
+def get_user_details(
+    user_name: str = Header(..., alias="User-Name"),
+    user_id: int = Header(..., alias="User-Id")
+):
     try:
-        payload = decode_token(current_user)
-        user_name = payload["user_name"]
         if not user_name:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={"msg": "User not found"})
 
@@ -26,70 +28,93 @@ def get_user_details(current_user: Annotated[str, Depends(oauth2_scheme)]):
 
         col_names = [col[0] for col in cursor.description]
         tasks = [dict(zip(col_names, row)) for row in data]
+
         return tasks[0]
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail={"msg":f"{e}"})
+        print(e)
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail={"msg": f"{e}"})
+
+from fastapi import Header
 
 @router.get("/total-task-length")
-def get_total_length(current_user: Annotated[str, Depends(oauth2_scheme)]):
+def get_total_length(
+    user_id: int = Header(..., alias="User-Id"),
+    user_name: str = Header(..., alias="User-Name")
+):
     try:
-        payload = decode_token(current_user)
-        user_name = payload["user_name"]
         if not user_name:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={"msg": "User not found"})
-        
-        user_id_query = "select id from users where username=%s"
-        cursor.execute(user_id_query, (user_name,))
-        user_id = cursor.fetchone()[0]
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail={"msg": "User not found"}
+            )
 
-        query = "select count(*) from tasks where user_id=%s"
+        query = "SELECT count(*) FROM tasks WHERE user_id=%s"
         cursor.execute(query, (user_id,))
         length = cursor.fetchone()
+
+        print("task_length_user_id")
+        print(user_id)
+
         return length[0]
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail={"msg":f"Internal server error {e}"})
+        print(e)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={"msg": f"Internal server error {e}"}
+        )
+
+from fastapi import Header
 
 @router.get("/get-tasks")
-def get_tasks(current_user: Annotated[str, Depends(oauth2_scheme)], page: int | None=None):
+def get_tasks(
+    page: int | None = None,
+    status: str | None = None,
+    user_id: int = Header(..., alias="User-Id"),
+    user_name: str = Header(..., alias="User-Name")
+):
     try:
-        payload = decode_token(current_user)
-        # return payload
-        user_name = payload["user_name"]
         if not user_name:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={"msg": "User not found"})
-
-        user_id_query = "select id from users where username=%s"
-        cursor.execute(user_id_query, (user_name,))
-        user_id = cursor.fetchone()[0]
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail={"msg": "User not found"}
+            )
 
         if not page:
-            temp2 = "select * from tasks"
-            cursor.execute(temp2)
+            query = "SELECT * FROM tasks"
+            cursor.execute(query)
+        if page and status:
+            offset = (page - 1) * 6
+            query = "SELECT * FROM tasks WHERE user_id=%s AND status=%s LIMIT 6 OFFSET %s"
+            cursor.execute(query, (user_id, status, offset))
         else:
             offset = (page - 1) * 6
-            get_tasks_query = "select * from tasks where user_id=%s LIMIT 6 OFFSET %s"
-            cursor.execute(get_tasks_query, (user_id, offset,))
+            query = "SELECT * FROM tasks WHERE user_id=%s LIMIT 6 OFFSET %s"
+            cursor.execute(query, (user_id, offset))
 
-        # cursor.execute(temp_query)
         col_names = [col[0] for col in cursor.description]
         data = cursor.fetchall()
-
         tasks = [dict(zip(col_names, row)) for row in data]
+
+        print("get-data-user_id")
+        print(user_id)
+
         return tasks
+
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail={"msg": f"Internal server error {e}"})
+        print(e)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={"msg": f"Internal server error {e}"}
+        )
 
 @router.post("/add-task", status_code=status.HTTP_201_CREATED)
 def create_task(current_user: Annotated[str, Depends(oauth2_scheme)], task: Create_Task):
     try:
         payload = decode_token(current_user)
         user_name = payload["user_name"]
+        user_id = payload["user_id"]
         if not user_name:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={"msg": "User not found"})
-
-        user_id_query = "SELECT id FROM users WHERE(username=%s)"
-        cursor.execute(user_id_query, (user_name,))
-        user_id = cursor.fetchone()[0]
 
         query_task = "INSERT INTO Tasks(title, description, created_at, user_id) VALUES (%s, %s, %s, %s)"
         cursor.execute(query_task, (task.title, task.description, datetime.now(), user_id))
@@ -131,13 +156,11 @@ def delete_task(current_user: Annotated[str, Depends(oauth2_scheme)],id: int = Q
 def assign_task(current_user: Annotated[str, Depends(oauth2_scheme)], task: task_assignment):
     try:
         payload = decode_token(current_user)
+        user_id = payload["user_id"]
         user_name = payload["user_name"]
         if not user_name:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={"msg": "user not found"})
         
-        user_id_query = "SELECT id FROM users WHERE(username=%s)"
-        cursor.execute(user_id_query, (task.user_name,))
-        user_id = cursor.fetchone()[0]
 
         user_id_query = "SELECT id FROM users WHERE(username=%s)"
         cursor.execute(user_id_query, (user_name,))

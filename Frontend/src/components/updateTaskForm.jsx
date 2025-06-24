@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import { useDispatch } from "react-redux";
 import { UpdateTaskAction } from "../redux/actions/TaskAction";
 
-function UpdateTaskForm({id, setIsUpdatedForm , isUpdatedForm}){
+function UpdateTaskForm({id, setIsUpdatedForm , isUpdatedForm, formData}){
     const [form, setForm] = useState({
         title: '',
         description: '',
@@ -10,6 +10,17 @@ function UpdateTaskForm({id, setIsUpdatedForm , isUpdatedForm}){
         id
     })
 
+    useEffect(() => {
+        if (formData) {
+            setForm({
+                title: formData.title,
+                description: formData.description,
+                status: formData.status,
+                id: formData.id
+            });
+        }
+    }, [formData]);
+    
     const dispatch = useDispatch();
     const handleSubmit = (e) =>{
         e.preventDefault();
@@ -26,7 +37,8 @@ function UpdateTaskForm({id, setIsUpdatedForm , isUpdatedForm}){
     const handleCLose = (e) =>{
         setIsUpdatedForm(false);
     }
-
+      
+    console.log(form,"formformform")
     return(
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
         { isUpdatedForm && <div className="bg-white p-6 rounded-lg shadow-lg w-96">

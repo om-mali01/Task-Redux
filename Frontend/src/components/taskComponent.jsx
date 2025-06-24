@@ -13,6 +13,7 @@ function TaskComponent() {
 
     const [isUpdatedForm, setIsUpdatedForm] = useState(false);
     const [selectedTaskId, setSelectedTaskId] = useState(null);
+    const [formData, setformData] = useState({});
 
     useEffect(() => {
         dispatch(getTasksAction(currentPage));
@@ -56,6 +57,7 @@ function TaskComponent() {
                                 onClick={() => {
                                     setIsUpdatedForm(true);
                                     setSelectedTaskId(task.id);
+                                    setformData(task)
                                 }}
                             >
                                 Update
@@ -119,7 +121,8 @@ function TaskComponent() {
                 <UpdateTaskForm 
                     id={selectedTaskId} 
                     setIsUpdatedForm={setIsUpdatedForm} 
-                    isUpdatedForm={isUpdatedForm} 
+                    isUpdatedForm={isUpdatedForm}
+                    formData={formData} 
                 />
             )}
         </div>

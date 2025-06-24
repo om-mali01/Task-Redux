@@ -1,4 +1,4 @@
-from config import SECRET_KEY, ALGORITHM
+from utils.config import SECRET_KEY, ALGORITHM
 import jwt
 from datetime import datetime, timezone, timedelta
 

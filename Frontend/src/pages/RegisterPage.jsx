@@ -24,8 +24,8 @@ function Register(){
     }
 
     return(
-        <div className="flex justify-center items-center h-screen bg-white">
-            <div className="bg-gray-200 p-8 rounded-md w-96">
+        <div className="flex justify-center items-center h-screen bg-[#030712]">
+            <div className="bg-[#101828] p-8 rounded-md w-96">
             <h1 className="text-center pb-5 text-lg">Register</h1>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
@@ -35,7 +35,7 @@ function Register(){
                     name="user_name"
                     value={form.user_name}
                     onChange={handleChange}
-                    className="p-3 w-full"
+                    className="p-3 w-full bg-[#101828] text-gray-100 border border-gray-500 rounded"
                     />
 
                     <input type="text"
@@ -43,7 +43,7 @@ function Register(){
                     name="email"
                     value={form.email}
                     onChange={handleChange}
-                    className="p-3 w-full"
+                    className="p-3 w-full bg-[#101828] text-gray-100 border border-gray-500 rounded"
                     />
 
                     <input type="text"
@@ -51,9 +51,9 @@ function Register(){
                     name="password"
                     value={form.password}
                     onChange={handleChange}
-                    className="p-3 w-full" />
+                    className="p-3 w-full bg-[#101828] text-gray-100 border border-gray-500 rounded" />
 
-                    <button className="w-full bg-blue-400 h-10" onClick={()=> navigate("/home")}>Register</button>
+                    <button className="w-full bg-blue-500 h-10 rounded-md" onClick={()=> navigate("/home")}>Register</button>
 
                 </form>
             </div>

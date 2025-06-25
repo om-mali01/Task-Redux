@@ -38,10 +38,10 @@ function UpdateTaskForm({id, setIsUpdatedForm , isUpdatedForm, formData}){
         setIsUpdatedForm(false);
     }
       
-    console.log(form,"formformform")
+    // console.log(form,"formformform")
     return(
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-        { isUpdatedForm && <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+        { isUpdatedForm && <div className="bg-[#101828] text-gray-100 p-6 rounded-lg shadow-lg w-96">
             <form onSubmit={handleSubmit} className="flex flex-col space-y-3 p-5 items-center">
             <h1 className="text-lg font-bold">Update the Task</h1>
                 <input type="text" 
@@ -49,7 +49,7 @@ function UpdateTaskForm({id, setIsUpdatedForm , isUpdatedForm, formData}){
                 name="title"
                 value={form.title}
                 onChange={handleChange}
-                className="p-1"
+                className="p-1 bg-[#101828] text-gray-100 border border-gray-500 rounded"
                 />
 
                 <input type="text"
@@ -57,7 +57,7 @@ function UpdateTaskForm({id, setIsUpdatedForm , isUpdatedForm, formData}){
                 name="description"
                 value={form.description}
                 onChange={handleChange}
-                className="p-1"
+                className="p-1 bg-[#101828] text-gray-100 border border-gray-500 rounded"
                 />
 
                 <input type="text"
@@ -65,13 +65,13 @@ function UpdateTaskForm({id, setIsUpdatedForm , isUpdatedForm, formData}){
                 name="status"
                 value={form.status}
                 onChange={handleChange}
-                className="p-1"
+                className="p-1 bg-[#101828] text-gray-100 border border-gray-500 rounded"
                 />
 
                 <div>
                     <button
                         type="submit"
-                        className="bg-blue-500 text-white px-4 py-2 m-2 rounded"
+                        className="bg-blue-800 text-white px-4 py-2 m-2 rounded"
                     >Update Task</button>
 
                     <button 

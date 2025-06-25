@@ -32,7 +32,7 @@ const AddTaskForm=({setIsData})=> {
 
     return(
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-            <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+            <div className="bg-[#101828] text-gray-100 p-6 rounded-lg shadow-lg w-96">
                 <h1 className="text-center text-lg font-bold mb-4">Create New Task</h1>
                 <form onSubmit={handleSubmit} className="flex flex-col">
                     <input
@@ -41,7 +41,7 @@ const AddTaskForm=({setIsData})=> {
                         name="title"
                         value={form.title}
                         onChange={handleChange}
-                        className="p-2 border rounded mb-2"
+                        className="p-2 bg-[#101828] text-gray-100 border border-gray-500 rounded m-2"
                         required
                     />
                     <input
@@ -50,10 +50,10 @@ const AddTaskForm=({setIsData})=> {
                         name="description"
                         value={form.description}
                         onChange={handleChange}
-                        className="p-2 border rounded mb-4"
+                        className="p-2 bg-[#101828] text-gray-100 border border-gray-500 rounded m-2"
                         required
                     />
-                    <div className="flex justify-between">
+                    <div className="flex justify-between m-2">
                         <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">Add Task</button>
                         <button onClick={handleClose} className="bg-gray-500 text-white px-4 py-2 rounded">Close</button>
                     </div>

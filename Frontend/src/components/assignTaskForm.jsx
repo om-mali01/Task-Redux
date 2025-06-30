@@ -29,7 +29,7 @@ function AssignTaskForm({setAssignForm}) {
 
     return(
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-            <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+            <div className="bg-[#101828] text-gray-100 p-6 rounded-lg shadow-lg w-96">
                 <form onSubmit={handleSubmit} className="flex flex-col space-y-4">
                     <h1 className="text-center">Assign Task</h1>
 
@@ -39,7 +39,7 @@ function AssignTaskForm({setAssignForm}) {
                     value={form.user_name}
                     onChange={handleChange}
                     required
-                    className="p-2"
+                    className="p-2 bg-[#101828] text-gray-100 border border-gray-500 rounded"
                     />
 
                     <input type="text"
@@ -47,7 +47,7 @@ function AssignTaskForm({setAssignForm}) {
                     name="task"
                     value={form.task}
                     onChange={handleChange}
-                    className="p-1"
+                    className="p-1 bg-[#101828] text-gray-100 border border-gray-500 rounded"
                     required/>
 
                     <input type="text"
@@ -55,7 +55,7 @@ function AssignTaskForm({setAssignForm}) {
                     name="description"
                     value={form.description}
                     onChange={handleChange}
-                    className="p-1"
+                    className="p-1 bg-[#101828] text-gray-100 border border-gray-500 rounded"
                     />
 
                     <div>
@@ -70,7 +70,6 @@ function AssignTaskForm({setAssignForm}) {
                     </div>
                 </form>
             </div>
-
         </div>
         
     )

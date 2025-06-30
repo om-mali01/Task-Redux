@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import UpdateTaskForm from "./updateTaskForm";
 import { data } from "react-router";
 
-function TaskComponent({selectedStatus, setStatus}) {
+function TaskComponent({selectedStatus}) {
 
     console.log(selectedStatus, "Hey !");
     const dispatch = useDispatch();

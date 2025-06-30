@@ -14,10 +14,10 @@ function FilterData({selectedStatus, setStatus}) {
     return (
         <div className="bg-gray-700 text-white text-sm h-7 p-1 rounded-md" FilterData={selectedStatus}>
             <select name="status" id="status" className="bg-gray-700" onChange={handleChange}>
-                <option value="complete">Complete</option>
-                <option value="pending">Pending</option>
-                <option value="in-process">In-Process</option>
                 <option value="all">All</option>
+                <option value="Completed">Complete</option>
+                <option value="Pending">Pending</option>
+                <option value="In-process">In-Process</option>
             </select>
         </div>
     )

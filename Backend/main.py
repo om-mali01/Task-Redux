@@ -1,165 +1,45 @@
-from fastapi import FastAPI, status, Query
-import psycopg2
-from pydantic import BaseModel
-from datetime import datetime
+# from fastapi import FastAPI
+# from fastapi.middleware.cors import CORSMiddleware
+# from routers import Authentication, Tasks
+
+# app = FastAPI()
+
+# app.add_middleware(
+#     CORSMiddleware,
+#     allow_origins = ["*"],
+#     allow_credentials=True,
+#     allow_methods=["*"],
+#     allow_headers=["*"],
+# )
+
+# app.include_router(Authentication.router)
+# app.include_router(Tasks.router)
+
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from typing import Optional
+from contextlib import asynccontextmanager
+from routers import Authentication, Tasks
+from database import DBConnectionPool  # this is your new async pool class
 
-class User_Register(BaseModel):
-    user_name: str
-    email: str
-    password: str
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Initialize and open the async pool at startup
+    app.pool = DBConnectionPool()
+    await app.pool.open()
+    yield
+    # Close the pool gracefully during shutdown
+    await app.pool.close()
 
-class User_Login(BaseModel):
-    user_name: str
-    password: str
-
-class Response(BaseModel):
-    status: bool
-    msg: str
-    status_code: int
-    data: Optional[dict] = None
-
-class Create_Task(BaseModel):
-    title: str
-    description: str
-    status: str | None=None
-
-class update_task(BaseModel):
-    title: str
-    description: str
-    status: str
-    id: int
-
-class task_assignment(BaseModel):
-    user_name: str
-    task: str
-    description: str
-
-app = FastAPI()
+app = FastAPI(lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins = ["*"],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-def create_connection():
-    connection = psycopg2.connect(
-        user='postgres',
-        password='mysecretpassword',
-        host='172.17.0.94',
-        port='5432',
-        database='Temp-Redux'
-    )
-    return connection
-
-connection = create_connection()
-cursor = connection.cursor()
-
-@app.get("/home")
-def home():
-    return {"key": "home page"}
-
-@app.get("/get-tasks")
-def get_tasks(page: int | None=None):
-
-    query = '''SELECT 
-    tasks.id AS task_id,
-    tasks.title, 
-    tasks.description, 
-    tasks.status, 
-    tasks.created_at, 
-    tasks.updated_at, 
-    users.id AS user_id, 
-    users.username, 
-    users.email
-    FROM tasks
-    JOIN task_assignments ON tasks.id = task_assignments.task_id
-    JOIN users ON task_assignments.user_id = users.id;'''
-
-   
-    if not page:
-        temp2 = "select * from tasks"
-        cursor.execute(temp2)
-    else:
-        offset = (page - 1) * 6
-        temp_query = f"SELECT * FROM tasks LIMIT 6 OFFSET {offset}"
-        cursor.execute(temp_query)
-
-    # cursor.execute(temp_query)
-    col_names = [col[0] for col in cursor.description]
-    data = cursor.fetchall()
-
-    tasks = [dict(zip(col_names, row)) for row in data]
-    return tasks
-
-@app.post("/register", status_code=status.HTTP_201_CREATED)
-def register(user: User_Register):
-    try:
-        query = "INSERT INTO users (username, email, password) VALUES (%s, %s, %s) RETURNING username, email"
-        cursor.execute(query, (user.user_name, user.email, user.password))
-        user_data = cursor.fetchone() 
-        connection.commit() 
-
-        if user_data:
-            return Response(status=True, msg="User Registered", data={"username": user_data[0], "email": user_data[1]}, status_code=201)
-        else:
-            return Response(status=False, msg="Registration failed", status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-    except Exception as e:
-        return Response(status=False, msg=f"Error: {str(e)}", status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-@app.post("/login", status_code=status.HTTP_200_OK)
-def login(user: User_Login):
-    query_password = "SELECT password FROM users WHERE(username=%s)"
-    cursor.execute(query_password, (user.user_name,))
-    password = cursor.fetchone()
-
-    query_data = "SELECT username, email FROM users WHERE(username=%s)"
-    cursor.execute(query_data, (user.user_name,))
-    user_data = cursor.fetchone()
-
-    if password[0] == user.password:
-        return Response(status=True, msg="Login successful", status_code=200, data={"username": user_data[0], "email": user_data[1]})
-    return Response(status=False, msg="Login Failed", data=user_data, status_code=status.HTTP_401_UNAUTHORIZED)
-
-@app.post("/add-task", status_code=status.HTTP_201_CREATED)
-def create_task(task: Create_Task):
-    query_task = "INSERT INTO Tasks(title, description, created_at) VALUES (%s, %s, %s)"
-    cursor.execute(query_task, (task.title, task.description, datetime.now()))
-    connection.commit()
-    return Response(status=True, msg="Task created successfully", status_code=201)
-
-@app.put("/task-update", status_code=status.HTTP_200_OK)
-def task_update(task: update_task):
-    update_task_query = "UPDATE tasks SET title = %s, description = %s, status = %s, updated_at =%s WHERE id = %s"
-    cursor.execute(update_task_query, (task.title, task.description, task.status, datetime.now(), task.id))
-    connection.commit()
-    return Response(status=True, msg="Task Updated successfully", status_code=200)
-
-@app.delete("/delete-task", status_code=status.HTTP_200_OK)
-def delete_task(id: int = Query(...)):
-    delete_query = "DELETE FROM tasks WHERE id=%s"
-    cursor.execute(delete_query, (id, ))
-    connection.commit()
-    return Response(status=True, msg="Task Deleted Successfully", status_code=200)
-
-@app.post("/assign-task", status_code=status.HTTP_200_OK)
-def assign_task(task: task_assignment):
-    add_task_query = "INSERT INTO tasks(title, description) VALUES (%s, %s) RETURNING id"
-    cursor.execute(add_task_query, (task.task, task.description))
-    task_id = cursor.fetchone()[0]
-    connection.commit()
-
-    user_id_query = "SELECT id FROM users WHERE(username=%s)"
-    cursor.execute(user_id_query, (task.user_name,))
-    user_id = cursor.fetchone()[0]
-
-    assign_table_insert = "INSERT INTO task_assignments(task_id, user_id) VALUES(%s, %s)"
-    cursor.execute(assign_table_insert, (task_id, user_id))
-    connection.commit()
-
-    return Response(status=True, msg="Task Assigned successfully", status_code=200)
+# Make the pool accessible inside routes via `request.app.pool`
+app.include_router(Authentication.router)
+app.include_router(Tasks.router)
